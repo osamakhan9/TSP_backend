@@ -14,21 +14,25 @@ const { UserModel } = require("../models/User.Model")
 
 
     U_routes.post("/login", async (req,res) =>{
-         const {email,password} = req.body;
+       
+  const {email,password}= req.body
+	try{
+		const existUser = await UserModel.findOne({email})
+		if(existUser){
+			res.status(404).send('This email has been used try to another email')
+		}else{
+			const user = await UserModel.create({
+				email,
+				password,
+			});
 
-          try{
-             const  Newuser = new UserModel({email,password})
-              await  Newuser.save()
-              res.send({"msg":"Signup sucessfully" }) 
-          }
-          catch(err){
-
-            
-            console.log(err)
-
-
-            res.send({"msg":"Invalid Credetials"})
-          }
+			res.send({
+				token: `${email} #${password}`
+			});
+		}
+	} catch (el){
+		res.status(404).send(e.massage)
+	}
 
     })
 
